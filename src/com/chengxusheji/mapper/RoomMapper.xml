@@ -1,0 +1,49 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.RoomMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加房间记录 -->
+	<insert id="addRoom" parameterType="room">
+		insert into t_room(roomNo,roomTypeObj,roomPhoto,roomPrice,floorNum,roomState,roomDesc) values 
+		(#{roomNo},#{roomTypeObj.roomTypeId},#{roomPhoto},#{roomPrice},#{floorNum},#{roomState},#{roomDesc})
+	</insert>
+
+	<!-- 按照查询条件分页查询房间记录 -->
+	<select id="queryRoom" resultMap="roomMap" >
+		select t_room.* from t_room,t_roomType ${where} and t_room.roomTypeObj = t_roomType.roomTypeId limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="roomMap" type="room">
+        <id property="roomNo" column="roomNo" />
+        <association property="roomTypeObj" column="roomTypeObj" select="com.chengxusheji.mapper.RoomTypeMapper.getRoomType" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有房间记录 -->
+	<select id="queryRoomList" resultMap="roomMap" >
+		select t_room.* from t_room,t_roomType ${where} and t_room.roomTypeObj = t_roomType.roomTypeId
+	</select>
+
+    <!-- 按照查询条件的房间记录数 -->
+	<select id="queryRoomCount" resultType="int">
+		select count(*) from t_room,t_roomType ${where} and t_room.roomTypeObj = t_roomType.roomTypeId
+	</select>
+
+	<!-- 根据主键查询某个房间记录 -->
+	<select id="getRoom" parameterType="string" resultMap="roomMap">
+		select * from t_room where t_room.roomNo = #{roomNo}
+	</select>
+
+	<!-- 更新房间记录 -->
+	<update id="updateRoom" parameterType="room">
+		update t_room set roomTypeObj=#{roomTypeObj.roomTypeId},roomPhoto=#{roomPhoto},roomPrice=#{roomPrice},floorNum=#{floorNum},roomState=#{roomState},roomDesc=#{roomDesc} where roomNo = #{roomNo}
+	</update>
+
+	<!-- 删除房间记录 -->
+	<delete id="deleteRoom" parameterType="string">
+		delete from t_room where roomNo=#{roomNo}
+	</delete>
+
+</mapper>

@@ -1,0 +1,48 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.RoomTypeMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加房间类型记录 -->
+	<insert id="addRoomType" parameterType="roomType">
+		insert into t_roomType(roomTypeName,price) values 
+		(#{roomTypeName},#{price})
+	</insert>
+
+	<!-- 按照查询条件分页查询房间类型记录 -->
+	<select id="queryRoomType" resultMap="roomTypeMap" >
+		select t_roomType.* from t_roomType ${where} limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="roomTypeMap" type="roomType">
+        <id property="roomTypeId" column="roomTypeId" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有房间类型记录 -->
+	<select id="queryRoomTypeList" resultMap="roomTypeMap" >
+		select t_roomType.* from t_roomType ${where}
+	</select>
+
+    <!-- 按照查询条件的房间类型记录数 -->
+	<select id="queryRoomTypeCount" resultType="int">
+		select count(*) from t_roomType ${where}
+	</select>
+
+	<!-- 根据主键查询某个房间类型记录 -->
+	<select id="getRoomType" parameterType="int" resultMap="roomTypeMap">
+		select * from t_roomType where t_roomType.roomTypeId = #{roomTypeId}
+	</select>
+
+	<!-- 更新房间类型记录 -->
+	<update id="updateRoomType" parameterType="roomType">
+		update t_roomType set roomTypeName=#{roomTypeName},price=#{price} where roomTypeId = #{roomTypeId}
+	</update>
+
+	<!-- 删除房间类型记录 -->
+	<delete id="deleteRoomType" parameterType="int">
+		delete from t_roomType where roomTypeId=#{roomTypeId}
+	</delete>
+
+</mapper>

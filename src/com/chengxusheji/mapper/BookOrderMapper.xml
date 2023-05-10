@@ -1,0 +1,51 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.BookOrderMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加房间预订记录 -->
+	<insert id="addBookOrder" parameterType="bookOrder">
+		insert into t_bookOrder(roomObj,roomTypeObj,userObj,liveDate,days,totalMoney,orderMemo,orderState,orderTime) values 
+		(#{roomObj.roomNo},#{roomTypeObj.roomTypeId},#{userObj.user_name},#{liveDate},#{days},#{totalMoney},#{orderMemo},#{orderState},#{orderTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询房间预订记录 -->
+	<select id="queryBookOrder" resultMap="bookOrderMap" >
+		select t_bookOrder.* from t_bookOrder,t_room,t_roomType,t_userInfo ${where} and t_bookOrder.roomObj = t_room.roomNo and t_bookOrder.roomTypeObj = t_roomType.roomTypeId and t_bookOrder.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="bookOrderMap" type="bookOrder">
+        <id property="orderId" column="orderId" />
+        <association property="roomObj" column="roomObj" select="com.chengxusheji.mapper.RoomMapper.getRoom" />
+        <association property="roomTypeObj" column="roomTypeObj" select="com.chengxusheji.mapper.RoomTypeMapper.getRoomType" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有房间预订记录 -->
+	<select id="queryBookOrderList" resultMap="bookOrderMap" >
+		select t_bookOrder.* from t_bookOrder,t_room,t_roomType,t_userInfo ${where} and t_bookOrder.roomObj = t_room.roomNo and t_bookOrder.roomTypeObj = t_roomType.roomTypeId and t_bookOrder.userObj = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的房间预订记录数 -->
+	<select id="queryBookOrderCount" resultType="int">
+		select count(*) from t_bookOrder,t_room,t_roomType,t_userInfo ${where} and t_bookOrder.roomObj = t_room.roomNo and t_bookOrder.roomTypeObj = t_roomType.roomTypeId and t_bookOrder.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个房间预订记录 -->
+	<select id="getBookOrder" parameterType="int" resultMap="bookOrderMap">
+		select * from t_bookOrder where t_bookOrder.orderId = #{orderId}
+	</select>
+
+	<!-- 更新房间预订记录 -->
+	<update id="updateBookOrder" parameterType="bookOrder">
+		update t_bookOrder set roomObj=#{roomObj.roomNo},roomTypeObj=#{roomTypeObj.roomTypeId},userObj=#{userObj.user_name},liveDate=#{liveDate},days=#{days},totalMoney=#{totalMoney},orderMemo=#{orderMemo},orderState=#{orderState},orderTime=#{orderTime} where orderId = #{orderId}
+	</update>
+
+	<!-- 删除房间预订记录 -->
+	<delete id="deleteBookOrder" parameterType="int">
+		delete from t_bookOrder where orderId=#{orderId}
+	</delete>
+
+</mapper>
